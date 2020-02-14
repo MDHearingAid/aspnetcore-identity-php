@@ -9,7 +9,18 @@ class PasswordHasherTest extends \PHPUnit\Framework\TestCase
     /**
      * Test some basic v3 hashed passwords.
      */
-    public function testSimpleV3Passwords()
+    public function testHashV3Passwords()
+    {
+        $hasher = new PasswordHasher();
+        $hashedPassword = $hasher->hashPassword('very strong password');
+        $result = $hasher->verifyHashedPassword($hashedPassword, 'very strong password');
+        $this->assertEquals(PasswordVerificationResult::SUCCESS, $result);
+    }
+
+    /**
+     * Test some basic v3 hashed passwords.
+     */
+    public function testVerifyV3Passwords()
     {
         $hasher = new PasswordHasher();
         $tests = [
