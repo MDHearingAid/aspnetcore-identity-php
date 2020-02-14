@@ -115,7 +115,7 @@ class PasswordHasher implements IPasswordHasher
         );
 
         $outputBytes = '';
-        $outputBytes{0} = chr(0x01); // format marker
+        $outputBytes[0] = chr(0x01); // format marker
         self::WriteNetworkByteOrder($outputBytes, 1, $prf);
         self::WriteNetworkByteOrder($outputBytes, 5, $iterCount);
         self::WriteNetworkByteOrder($outputBytes, 9, $saltSize);
