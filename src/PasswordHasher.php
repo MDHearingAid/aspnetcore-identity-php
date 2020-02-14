@@ -2,6 +2,8 @@
 
 namespace MDHearing\AspNetCore\Identity;
 
+use InvalidArgumentException;
+
 /**
  * Implements the standard Identity password hashing.
  */
@@ -43,12 +45,12 @@ class PasswordHasher implements IPasswordHasher
             case PasswordHasherCompatibilityMode::IDENTITYV3:
                 $this->iterCount = $iterationsCount;
                 if ($this->iterCount < 1) {
-                    throw new \InvalidArgumentException('Invalid password hasher iteration count.');
+                    throw new InvalidArgumentException('Invalid password hasher iteration count.');
                 }
                 break;
 
             default:
-                throw new \InvalidArgumentException('Invalid password hasher compatibility mode.');
+                throw new InvalidArgumentException('Invalid password hasher compatibility mode.');
         }
     }
 
@@ -139,11 +141,11 @@ class PasswordHasher implements IPasswordHasher
     public function verifyHashedPassword($hashedPassword, $providedPassword)
     {
         if ($hashedPassword == null) {
-            throw new \InvalidArgumentException('hashedPassword is null');
+            throw new InvalidArgumentException('hashedPassword is null');
         }
 
         if ($providedPassword == null) {
-            throw new \InvalidArgumentException('providedPassword is null');
+            throw new InvalidArgumentException('providedPassword is null');
         }
 
         $decodedHashedPassword = base64_decode($hashedPassword);
@@ -155,29 +157,52 @@ class PasswordHasher implements IPasswordHasher
 
         switch (ord($decodedHashedPassword[0])) {
             case 0x00:
-                if (self::verifyHashedPasswordV2($decodedHashedPassword, $providedPassword)) {
-                    // This is an old password hash format - the caller needs to
-                    // rehash if we're not running in an older compat mode.
-                    return ($this->compatibilityMode == PasswordHasherCompatibilityMode::IDENTITYV3)
-                        ? PasswordVerificationResult::SUCCESS_REHASH_NEEDED
-                        : PasswordVerificationResult::SUCCESS;
-                } else {
-                    return PasswordVerificationResult::FAILED;
-                }
-
+                return $this->verifyWithV2($decodedHashedPassword, $providedPassword);
             case 0x01:
-                $embeddedIterCount = null;
-                if (self::verifyHashedPasswordV3($decodedHashedPassword, $providedPassword, $embeddedIterCount)) {
-                    // If this hasher was configured with a higher iteration count, change the entry now.
-                    return ($embeddedIterCount < $this->iterCount)
-                        ? PasswordVerificationResult::SUCCESS_REHASH_NEEDED
-                        : PasswordVerificationResult::SUCCESS;
-                } else {
-                    return PasswordVerificationResult::FAILED;
-                }
-
+                return $this->verifyWithV3($decodedHashedPassword, $providedPassword);
             default:
                 return PasswordVerificationResult::FAILED; // unknown format marker
+        }
+    }
+
+    /**
+     * Performs verification using strategy version 2.
+     *
+     * @param  string $decodedHashedPassword
+     * @param  string $providedPassword
+     * @return integer
+     */
+    private function verifyWithV2($decodedHashedPassword, $providedPassword)
+    {
+        if (self::verifyHashedPasswordV2($decodedHashedPassword, $providedPassword)) {
+            // This is an old password hash format - the caller needs to
+            // rehash if we're not running in an older compat mode.
+            return ($this->compatibilityMode == PasswordHasherCompatibilityMode::IDENTITYV3)
+                ? PasswordVerificationResult::SUCCESS_REHASH_NEEDED
+                : PasswordVerificationResult::SUCCESS;
+        } else {
+            return PasswordVerificationResult::FAILED;
+        }
+    }
+
+    /**
+     * Performs verification using strategy version 3.
+     *
+     * @param  string $decodedHashedPassword
+     * @param  string $providedPassword
+     * @return integer
+     */
+    private function verifyWithV3($decodedHashedPassword, $providedPassword)
+    {
+        $embeddedIterCount = null;
+
+        if (self::verifyHashedPasswordV3($decodedHashedPassword, $providedPassword, $embeddedIterCount)) {
+            // If this hasher was configured with a higher iteration count, change the entry now.
+            return ($embeddedIterCount < $this->iterCount)
+                ? PasswordVerificationResult::SUCCESS_REHASH_NEEDED
+                : PasswordVerificationResult::SUCCESS;
+        } else {
+            return PasswordVerificationResult::FAILED;
         }
     }
 
