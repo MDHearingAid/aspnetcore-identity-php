@@ -7,7 +7,7 @@
 [![Quality Score][ico-code-quality]][link-code-quality]
 [![Total Downloads][ico-downloads]][link-downloads]
 
-A direct port of the algorithms used to generate and verify ASP.NET password hashes in .NET Core.
+A direct PHP port of the algorithms used to generate and verify ASP.NET password hashes in .NET Core.
 
 https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Extensions.Core/src/PasswordHasher.cs
 
