@@ -249,17 +249,17 @@ class PasswordHasher implements IPasswordHasher
 
     private static function writeNetworkByteOrder(&$buffer, $offset, $value)
     {
-        $buffer{$offset} = chr($value >> 24);
-        $buffer{$offset + 1} = chr(($value >> 16) & 0xFF);
-        $buffer{$offset + 2} = chr(($value >> 8) & 0xFF);
-        $buffer{$offset + 3} = chr($value & 0xFF);
+        $buffer[$offset] = chr($value >> 24);
+        $buffer[$offset + 1] = chr(($value >> 16) & 0xFF);
+        $buffer[$offset + 2] = chr(($value >> 8) & 0xFF);
+        $buffer[$offset + 3] = chr($value & 0xFF);
     }
 
     private static function readNetworkByteOrder($buffer, $offset)
     {
-        return ord($buffer{$offset}) << 24
-            | ord($buffer{$offset + 1}) << 16
-            | ord($buffer{$offset + 2}) << 8
-            | ord($buffer{$offset + 3});
+        return ord($buffer[$offset]) << 24
+            | ord($buffer[$offset + 1]) << 16
+            | ord($buffer[$offset + 2]) << 8
+            | ord($buffer[$offset + 3]);
     }
 }
