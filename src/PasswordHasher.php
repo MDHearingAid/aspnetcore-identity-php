@@ -166,7 +166,7 @@ class PasswordHasher implements IPasswordHasher
                 }
 
             case 0x01:
-                $embeddedIterCount;
+                $embeddedIterCount = null;
                 if (self::verifyHashedPasswordV3($decodedHashedPassword, $providedPassword, $embeddedIterCount)) {
                     // If this hasher was configured with a higher iteration count, change the entry now.
                     return ($embeddedIterCount < $this->iterCount)
