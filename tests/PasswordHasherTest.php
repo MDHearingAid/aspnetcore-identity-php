@@ -7,7 +7,7 @@ namespace MDHearing\AspNetCore\Identity;
 class PasswordHasherTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * Test that true does in fact equal true
+     * Test some basic v3 hashed passwords.
      */
     public function testSimpleV3Passwords()
     {
