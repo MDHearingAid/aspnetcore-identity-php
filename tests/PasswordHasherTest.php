@@ -53,20 +53,20 @@ class PasswordHasherTest extends \PHPUnit\Framework\TestCase
         foreach ($tests as $test) {
             $original = $test;
 
-            $test['actual']     = $hasher->VerifyHashedPassword($test['hash'], $test['password']);
+            $test['actual']     = $hasher->verifyHashedPassword($test['hash'], $test['password']);
             $this->assertEquals($test['expected'], $test['actual']);
 
 
             $test['hash']       = $original['hash'].'+bogus';
             $test['password']   = $original['password'];
             $test['expected']   = 0;
-            $test['actual']     = $hasher->VerifyHashedPassword($test['hash'], $test['password']);
+            $test['actual']     = $hasher->verifyHashedPassword($test['hash'], $test['password']);
             $this->assertEquals($test['expected'], $test['actual']);
 
             $test['hash']       = $original['hash'];
             $test['password']   = $original['password'].'+bogus';
             $test['expected']   = 0;
-            $test['actual']     = $hasher->VerifyHashedPassword($test['hash'], $test['password']);
+            $test['actual']     = $hasher->verifyHashedPassword($test['hash'], $test['password']);
             $this->assertEquals($test['expected'], $test['actual']);
         }
     }

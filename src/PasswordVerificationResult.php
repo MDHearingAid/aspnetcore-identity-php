@@ -5,7 +5,7 @@ namespace MDHearing\AspNetCore\Identity;
 /**
  * Specifies the results for password verification.
  */
-class PasswordVerificationResult
+abstract class PasswordVerificationResult
 {
     /**
      * Indicates password verification failed.

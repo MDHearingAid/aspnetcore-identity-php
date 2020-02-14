@@ -14,7 +14,7 @@ interface IPasswordHasher
       *
       * @returns A hashed representation of the supplied password.
       */
-    function HashPassword($password);
+    function hashPassword($password);
 
     /**
       * Returns a PasswordVerificationResult indicating the result of a password hash comparison.
@@ -24,6 +24,6 @@ interface IPasswordHasher
       *
       * @returns A PasswordVerificationResult indicating the result of a password hash comparison.
       */
-    function VerifyHashedPassword($hashedPassword, $providedPassword);
+    function verifyHashedPassword($hashedPassword, $providedPassword);
 }
 

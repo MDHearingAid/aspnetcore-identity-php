@@ -37,8 +37,9 @@ $ composer require mdhearing/aspnetcore-identity
 ## Usage
 
 ``` php
-$skeleton = new MDHearing\AspNetCore\Identity();
-echo $skeleton->echoPhrase('Hello, League!');
+$hasher = new MDHearing\AspNetCore\Identity\PasswordHasher();
+$hashedPassword = $hasher->hashPassword('very strong password');
+$result = $hasher->verifyHashedPassword($hashedPassword, 'very strong password');
 ```
 
 ## Change log
@@ -70,15 +71,15 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 
 [ico-version]: https://img.shields.io/packagist/v/mdhearing/aspnetcore-identity.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
-[ico-travis]: https://img.shields.io/travis/mdhearing/aspnetcore-identity/master.svg?style=flat-square
-[ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/mdhearing/aspnetcore-identity.svg?style=flat-square
-[ico-code-quality]: https://img.shields.io/scrutinizer/g/mdhearing/aspnetcore-identity.svg?style=flat-square
+[ico-travis]: https://img.shields.io/travis/mdhearingaid/aspnetcore-identity/master.svg?style=flat-square
+[ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/mdhearingaid/aspnetcore-identity.svg?style=flat-square
+[ico-code-quality]: https://img.shields.io/scrutinizer/g/mdhearingaid/aspnetcore-identity.svg?style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/mdhearing/aspnetcore-identity.svg?style=flat-square
 
 [link-packagist]: https://packagist.org/packages/mdhearing/aspnetcore-identity
-[link-travis]: https://travis-ci.org/mdhearing/aspnetcore-identity
-[link-scrutinizer]: https://scrutinizer-ci.com/g/mdhearing/aspnetcore-identity/code-structure
-[link-code-quality]: https://scrutinizer-ci.com/g/mdhearing/aspnetcore-identity
+[link-travis]: https://travis-ci.org/mdhearingaid/aspnetcore-identity
+[link-scrutinizer]: https://scrutinizer-ci.com/g/mdhearingaid/aspnetcore-identity/code-structure
+[link-code-quality]: https://scrutinizer-ci.com/g/mdhearingaid/aspnetcore-identity
 [link-downloads]: https://packagist.org/packages/mdhearing/aspnetcore-identity
 [link-author]: https://github.com/stevenmaguire
 [link-contributors]: ../../contributors

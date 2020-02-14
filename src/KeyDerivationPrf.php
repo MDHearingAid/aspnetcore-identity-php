@@ -2,7 +2,7 @@
 
 namespace MDHearing\AspNetCore\Identity;
 
-class KeyDerivationPrf
+abstract class KeyDerivationPrf
 {
     /**
      * The HMAC algorithm (RFC 2104) using the SHA-1 hash function (FIPS 180-4).

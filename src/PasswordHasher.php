@@ -57,20 +57,20 @@ class PasswordHasher implements IPasswordHasher
       *
       * @returns A hashed representation of the supplied password for the specified user.
       */
-    public function HashPassword($password)
+    public function hashPassword($password)
     {
         if ($password == null) {
             throw new ArgumentNullException('password');
         }
 
         if ($this->_compatibilityMode == PasswordHasherCompatibilityMode::IdentityV2) {
-            return base64_encode(self::HashPasswordV2($password));
+            return base64_encode(self::hashPasswordV2($password));
         } else {
-            return base64_encode($this->HashPasswordV3($password));
+            return base64_encode($this->hashPasswordV3($password));
         }
     }
 
-    private static function HashPasswordV2($password)
+    private static function hashPasswordV2($password)
     {
         $Pbkdf2Prf = KeyDerivationPrf::HMACSHA1; // default for Rfc2898DeriveBytes
         $Pbkdf2IterCount = 1000; // default for Rfc2898DeriveBytes
@@ -86,7 +86,7 @@ class PasswordHasher implements IPasswordHasher
         return $outputBytes;
     }
 
-    private function HashPasswordV3($password)
+    private function hashPasswordV3($password)
     {
         $prf = KeyDerivationPrf::HMACSHA256;
         $iterCount = $this->_iterCount;
@@ -119,7 +119,7 @@ class PasswordHasher implements IPasswordHasher
       *
       * Implementations of this method should be time consistent.
       */
-    public function VerifyHashedPassword($hashedPassword, $providedPassword)
+    public function verifyHashedPassword($hashedPassword, $providedPassword)
     {
         if ($hashedPassword == null) {
             throw new \InvalidArgumentException('hashedPassword is null');
@@ -138,7 +138,7 @@ class PasswordHasher implements IPasswordHasher
 
         switch (ord($decodedHashedPassword{0})) {
             case 0x00:
-                if (self::VerifyHashedPasswordV2($decodedHashedPassword, $providedPassword)) {
+                if (self::verifyHashedPasswordV2($decodedHashedPassword, $providedPassword)) {
                     // This is an old password hash format - the caller needs to rehash if we're not running in an older compat mode.
                     return ($this->_compatibilityMode == PasswordHasherCompatibilityMode::IdentityV3)
                         ? PasswordVerificationResult::SuccessRehashNeeded
@@ -149,7 +149,7 @@ class PasswordHasher implements IPasswordHasher
 
             case 0x01:
                 $embeddedIterCount;
-                if (self::VerifyHashedPasswordV3($decodedHashedPassword, $providedPassword, $embeddedIterCount)) {
+                if (self::verifyHashedPasswordV3($decodedHashedPassword, $providedPassword, $embeddedIterCount)) {
                     // If this hasher was configured with a higher iteration count, change the entry now.
                     return ($embeddedIterCount < $this->_iterCount)
                         ? PasswordVerificationResult::SuccessRehashNeeded
@@ -163,7 +163,7 @@ class PasswordHasher implements IPasswordHasher
         }
     }
 
-    private static function VerifyHashedPasswordV2($hashedPassword, $password)
+    private static function verifyHashedPasswordV2($hashedPassword, $password)
     {
         $Pbkdf2Prf = KeyDerivationPrf::HMACSHA1; // default for Rfc2898DeriveBytes
         $Pbkdf2IterCount = 1000; // default for Rfc2898DeriveBytes
@@ -185,14 +185,14 @@ class PasswordHasher implements IPasswordHasher
         return $actualSubkey === $expectedSubkey;
     }
 
-    private static function VerifyHashedPasswordV3($hashedPassword, $password, &$iterCount)
+    private static function verifyHashedPasswordV3($hashedPassword, $password, &$iterCount)
     {
         $iterCount = 0;
 
         // Read header information
-        $prf = self::ReadNetworkByteOrder($hashedPassword, 1);
-        $iterCount = self::ReadNetworkByteOrder($hashedPassword, 5);
-        $saltLength = self::ReadNetworkByteOrder($hashedPassword, 9);
+        $prf = self::readNetworkByteOrder($hashedPassword, 1);
+        $iterCount = self::readNetworkByteOrder($hashedPassword, 5);
+        $saltLength = self::readNetworkByteOrder($hashedPassword, 9);
 
         // Read the salt: must be >= 128 bits
         if ($saltLength < intdiv(128, 8)) {
@@ -215,7 +215,7 @@ class PasswordHasher implements IPasswordHasher
         return $actualSubkey === $expectedSubkey;
     }
 
-    private static function WriteNetworkByteOrder(&$buffer, $offset, $value)
+    private static function writeNetworkByteOrder(&$buffer, $offset, $value)
     {
         $buffer{$offset} = chr($value >> 24);
         $buffer{$offset + 1} = chr(($value >> 16) & 0xFF);
@@ -223,7 +223,7 @@ class PasswordHasher implements IPasswordHasher
         $buffer{$offset + 3} = chr($value & 0xFF);
     }
 
-    private static function ReadNetworkByteOrder($buffer, $offset)
+    private static function readNetworkByteOrder($buffer, $offset)
     {
         return ord($buffer{$offset}) << 24
             | ord($buffer{$offset + 1}) << 16
