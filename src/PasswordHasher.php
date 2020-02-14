@@ -69,7 +69,7 @@ class PasswordHasher implements IPasswordHasher
         }
 
         if ($this->compatibilityMode == PasswordHasherCompatibilityMode::IDENTITYV2) {
-            return base64_encode(self::hashPasswordV2($password));
+            return base64_encode(static::hashPasswordV2($password));
         } else {
             return base64_encode($this->hashPasswordV3($password));
         }
@@ -118,9 +118,9 @@ class PasswordHasher implements IPasswordHasher
 
         $outputBytes = '';
         $outputBytes[0] = chr(0x01); // format marker
-        self::WriteNetworkByteOrder($outputBytes, 1, $prf);
-        self::WriteNetworkByteOrder($outputBytes, 5, $iterCount);
-        self::WriteNetworkByteOrder($outputBytes, 9, $saltSize);
+        static::WriteNetworkByteOrder($outputBytes, 1, $prf);
+        static::WriteNetworkByteOrder($outputBytes, 5, $iterCount);
+        static::WriteNetworkByteOrder($outputBytes, 9, $saltSize);
 
         $outputBytes .= $salt;
         $outputBytes .= $subkey;
@@ -174,7 +174,7 @@ class PasswordHasher implements IPasswordHasher
      */
     private function verifyWithV2($decodedHashedPassword, $providedPassword)
     {
-        if (self::verifyHashedPasswordV2($decodedHashedPassword, $providedPassword)) {
+        if (static::verifyHashedPasswordV2($decodedHashedPassword, $providedPassword)) {
             // This is an old password hash format - the caller needs to
             // rehash if we're not running in an older compat mode.
             return ($this->compatibilityMode == PasswordHasherCompatibilityMode::IDENTITYV3)
@@ -196,7 +196,7 @@ class PasswordHasher implements IPasswordHasher
     {
         $embeddedIterCount = null;
 
-        if (self::verifyHashedPasswordV3($decodedHashedPassword, $providedPassword, $embeddedIterCount)) {
+        if (static::verifyHashedPasswordV3($decodedHashedPassword, $providedPassword, $embeddedIterCount)) {
             // If this hasher was configured with a higher iteration count, change the entry now.
             return ($embeddedIterCount < $this->iterCount)
                 ? PasswordVerificationResult::SUCCESS_REHASH_NEEDED
@@ -240,9 +240,9 @@ class PasswordHasher implements IPasswordHasher
         $iterCount = 0;
 
         // Read header information
-        $prf = self::readNetworkByteOrder($hashedPassword, 1);
-        $iterCount = self::readNetworkByteOrder($hashedPassword, 5);
-        $saltLength = self::readNetworkByteOrder($hashedPassword, 9);
+        $prf = static::readNetworkByteOrder($hashedPassword, 1);
+        $iterCount = static::readNetworkByteOrder($hashedPassword, 5);
+        $saltLength = static::readNetworkByteOrder($hashedPassword, 9);
 
         // Read the salt: must be >= 128 bits
         if ($saltLength < intdiv(128, 8)) {
