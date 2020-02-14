@@ -33,16 +33,16 @@ class PasswordHasher implements IPasswordHasher
       * @param $optionsAccessor The options for this instance.
       */
     public function __construct(
-        $compatibilityMode = PasswordHasherCompatibilityMode::IDENTITYV3,
+        $compatibilityMode = PasswordHasherCompatibilityMode::IDENTITY_V3,
         $iterationsCount = 10000
     ) {
         $this->compatibilityMode = $compatibilityMode;
         switch ($this->compatibilityMode) {
-            case PasswordHasherCompatibilityMode::IDENTITYV2:
+            case PasswordHasherCompatibilityMode::IDENTITY_V2:
                 // nothing else to do
                 break;
 
-            case PasswordHasherCompatibilityMode::IDENTITYV3:
+            case PasswordHasherCompatibilityMode::IDENTITY_V3:
                 $this->iterCount = $iterationsCount;
                 if ($this->iterCount < 1) {
                     throw new InvalidArgumentException('Invalid password hasher iteration count.');
@@ -65,10 +65,10 @@ class PasswordHasher implements IPasswordHasher
     public function hashPassword($password)
     {
         if ($password == null) {
-            throw new ArgumentNullException('password');
+            throw new InvalidArgumentException('Password cannot be null');
         }
 
-        if ($this->compatibilityMode == PasswordHasherCompatibilityMode::IDENTITYV2) {
+        if ($this->compatibilityMode == PasswordHasherCompatibilityMode::IDENTITY_V2) {
             return base64_encode(static::hashPasswordV2($password));
         } else {
             return base64_encode($this->hashPasswordV3($password));
@@ -177,7 +177,7 @@ class PasswordHasher implements IPasswordHasher
         if (static::verifyHashedPasswordV2($decodedHashedPassword, $providedPassword)) {
             // This is an old password hash format - the caller needs to
             // rehash if we're not running in an older compat mode.
-            return ($this->compatibilityMode == PasswordHasherCompatibilityMode::IDENTITYV3)
+            return ($this->compatibilityMode == PasswordHasherCompatibilityMode::IDENTITY_V3)
                 ? PasswordVerificationResult::SUCCESS_REHASH_NEEDED
                 : PasswordVerificationResult::SUCCESS;
         } else {

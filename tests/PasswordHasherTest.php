@@ -4,10 +4,71 @@ declare(strict_types=1);
 
 namespace MDHearing\AspNetCore\Identity;
 
+use InvalidArgumentException;
+
 class PasswordHasherTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * Test some basic v3 hashed passwords.
+     * Test invalid compatibility.
+     */
+    public function testInvalidCompatibility()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $hasher = new PasswordHasher(4);
+    }
+
+    /**
+     * Test invalid password hashing.
+     */
+    public function testInvalidPasswordHashing()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $hasher = new PasswordHasher();
+        $hashedPassword = $hasher->hashPassword(null);
+    }
+
+    /**
+     * Test invalid password hash verification.
+     */
+    public function testInvalidPasswordHashVerification()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $hasher = new PasswordHasher();
+        $hashedPassword = $hasher->verifyHashedPassword(null, 'very strong password');
+    }
+
+    /**
+     * Test invalid password verification.
+     */
+    public function testInvalidPasswordVerification()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $hasher = new PasswordHasher();
+        $hashedPassword = $hasher->verifyHashedPassword('very strong hash', null);
+    }
+
+    /**
+     * Test some basic v2 password hashing.
+     */
+    public function testHashV2Passwords()
+    {
+        $hasher = new PasswordHasher(PasswordHasherCompatibilityMode::IDENTITY_V2);
+        $hashedPassword = $hasher->hashPassword('very strong password');
+        $result = $hasher->verifyHashedPassword($hashedPassword, 'very strong password');
+        $this->assertEquals(PasswordVerificationResult::SUCCESS, $result);
+    }
+
+    /**
+     * Test insufficient v3 iteration count.
+     */
+    public function testInsufficientV3IterationCount()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $hasher = new PasswordHasher(PasswordHasherCompatibilityMode::IDENTITY_V3, 0);
+    }
+
+    /**
+     * Test some basic v3 password hashing.
      */
     public function testHashV3Passwords()
     {
