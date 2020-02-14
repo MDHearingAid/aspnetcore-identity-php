@@ -56,15 +56,15 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 
 [ico-version]: https://img.shields.io/packagist/v/mdhearing/aspnetcore-identity.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
-[ico-travis]: https://img.shields.io/travis/MDHearingAid/aspnetcore-identity/master.svg?style=flat-square
-[ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/MDHearingAid/aspnetcore-identity.svg?style=flat-square
-[ico-code-quality]: https://img.shields.io/scrutinizer/g/MDHearingAid/aspnetcore-identity.svg?style=flat-square
+[ico-travis]: https://img.shields.io/travis/MDHearingAid/aspnetcore-identity-php/master.svg?style=flat-square
+[ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/MDHearingAid/aspnetcore-identity-php.svg?style=flat-square
+[ico-code-quality]: https://img.shields.io/scrutinizer/g/MDHearingAid/aspnetcore-identity-php.svg?style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/mdhearing/aspnetcore-identity.svg?style=flat-square
 
 [link-packagist]: https://packagist.org/packages/mdhearing/aspnetcore-identity
-[link-travis]: https://travis-ci.org/MDHearingAid/aspnetcore-identity
-[link-scrutinizer]: https://scrutinizer-ci.com/g/MDHearingAid/aspnetcore-identity/code-structure
-[link-code-quality]: https://scrutinizer-ci.com/g/MDHearingAid/aspnetcore-identity
+[link-travis]: https://travis-ci.org/MDHearingAid/aspnetcore-identity-php
+[link-scrutinizer]: https://scrutinizer-ci.com/g/MDHearingAid/aspnetcore-identity-php/code-structure
+[link-code-quality]: https://scrutinizer-ci.com/g/MDHearingAid/aspnetcore-identity-php
 [link-downloads]: https://packagist.org/packages/mdhearing/aspnetcore-identity
 [link-author]: https://github.com/stevenmaguire
 [link-contributors]: ../../contributors
