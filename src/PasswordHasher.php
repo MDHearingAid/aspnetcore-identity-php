@@ -22,25 +22,27 @@ class PasswordHasher implements IPasswordHasher
      * (All UInt32s are stored big-endian.)
      */
 
-    private $_compatibilityMode;
-    private $_iterCount;
+    private $compatibilityMode;
+    private $iterCount;
 
     /**
       * Creates a new instance of <see cref="PasswordHasher{TUser}"/>.
       *
       * @param $optionsAccessor The options for this instance.
       */
-    public function __construct($compatibilityMode = PasswordHasherCompatibilityMode::IdentityV3, $iterationsCount = 10000)
-    {
-        $this->_compatibilityMode = $compatibilityMode;
-        switch ($this->_compatibilityMode) {
-            case PasswordHasherCompatibilityMode::IdentityV2:
+    public function __construct(
+        $compatibilityMode = PasswordHasherCompatibilityMode::IDENTITYV3,
+        $iterationsCount = 10000
+    ) {
+        $this->compatibilityMode = $compatibilityMode;
+        switch ($this->compatibilityMode) {
+            case PasswordHasherCompatibilityMode::IDENTITYV2:
                 // nothing else to do
                 break;
 
-            case PasswordHasherCompatibilityMode::IdentityV3:
-                $this->_iterCount = $iterationsCount;
-                if ($this->_iterCount < 1) {
+            case PasswordHasherCompatibilityMode::IDENTITYV3:
+                $this->iterCount = $iterationsCount;
+                if ($this->iterCount < 1) {
                     throw new \InvalidArgumentException('Invalid password hasher iteration count.');
                 }
                 break;
@@ -51,7 +53,8 @@ class PasswordHasher implements IPasswordHasher
     }
 
     /**
-      * Returns a hashed representation of the supplied <paramref name="password"/> for the specified <paramref name="user"/>.
+      * Returns a hashed representation of the supplied <paramref name="password"/>
+      * for the specified <paramref name="user"/>.
       *
       * @param $password The password to hash.
       *
@@ -63,7 +66,7 @@ class PasswordHasher implements IPasswordHasher
             throw new ArgumentNullException('password');
         }
 
-        if ($this->_compatibilityMode == PasswordHasherCompatibilityMode::IdentityV2) {
+        if ($this->compatibilityMode == PasswordHasherCompatibilityMode::IDENTITYV2) {
             return base64_encode(self::hashPasswordV2($password));
         } else {
             return base64_encode($this->hashPasswordV3($password));
@@ -79,7 +82,14 @@ class PasswordHasher implements IPasswordHasher
 
         // Produce a version 2 (see comment above) text hash.
         $salt = random_bytes($SaltSize);
-        $subkey = hash_pbkdf2(KeyDerivationPrf::ALGO_NAME[$Pbkdf2Prf], $password, $salt, $Pbkdf2IterCount, $Pbkdf2SubkeyLength, true);
+        $subkey = hash_pbkdf2(
+            KeyDerivationPrf::ALGO_NAME[$Pbkdf2Prf],
+            $password,
+            $salt,
+            $Pbkdf2IterCount,
+            $Pbkdf2SubkeyLength,
+            true
+        );
 
         $outputBytes = chr(0) . $salt . $subkey;
 
@@ -89,13 +99,20 @@ class PasswordHasher implements IPasswordHasher
     private function hashPasswordV3($password)
     {
         $prf = KeyDerivationPrf::HMACSHA256;
-        $iterCount = $this->_iterCount;
+        $iterCount = $this->iterCount;
         $saltSize = intdiv(128, 8);
         $numBytesRequested = intdiv(256, 8);
 
         // Produce a version 3 (see comment above) text hash.
         $salt = random_bytes($saltSize);
-        $subkey = hash_pbkdf2(KeyDerivationPrf::ALGO_NAME[$prf], $password, $salt, $iterCount, $numBytesRequested, true);
+        $subkey = hash_pbkdf2(
+            KeyDerivationPrf::ALGO_NAME[$prf],
+            $password,
+            $salt,
+            $iterCount,
+            $numBytesRequested,
+            true
+        );
 
         $outputBytes = '';
         $outputBytes{0} = chr(0x01); // format marker
@@ -133,33 +150,34 @@ class PasswordHasher implements IPasswordHasher
 
         // read the format marker from the hashed password
         if (strlen($decodedHashedPassword) == 0) {
-            return PasswordVerificationResult::Failed;
+            return PasswordVerificationResult::FAILED;
         }
 
         switch (ord($decodedHashedPassword{0})) {
             case 0x00:
                 if (self::verifyHashedPasswordV2($decodedHashedPassword, $providedPassword)) {
-                    // This is an old password hash format - the caller needs to rehash if we're not running in an older compat mode.
-                    return ($this->_compatibilityMode == PasswordHasherCompatibilityMode::IdentityV3)
-                        ? PasswordVerificationResult::SuccessRehashNeeded
-                        : PasswordVerificationResult::Success;
+                    // This is an old password hash format - the caller needs to
+                    // rehash if we're not running in an older compat mode.
+                    return ($this->compatibilityMode == PasswordHasherCompatibilityMode::IDENTITYV3)
+                        ? PasswordVerificationResult::SUCCESS_REHASH_NEEDED
+                        : PasswordVerificationResult::SUCCESS;
                 } else {
-                    return PasswordVerificationResult::Failed;
+                    return PasswordVerificationResult::FAILED;
                 }
 
             case 0x01:
                 $embeddedIterCount;
                 if (self::verifyHashedPasswordV3($decodedHashedPassword, $providedPassword, $embeddedIterCount)) {
                     // If this hasher was configured with a higher iteration count, change the entry now.
-                    return ($embeddedIterCount < $this->_iterCount)
-                        ? PasswordVerificationResult::SuccessRehashNeeded
-                        : PasswordVerificationResult::Success;
+                    return ($embeddedIterCount < $this->iterCount)
+                        ? PasswordVerificationResult::SUCCESS_REHASH_NEEDED
+                        : PasswordVerificationResult::SUCCESS;
                 } else {
-                    return PasswordVerificationResult::Failed;
+                    return PasswordVerificationResult::FAILED;
                 }
 
             default:
-                return PasswordVerificationResult::Failed; // unknown format marker
+                return PasswordVerificationResult::FAILED; // unknown format marker
         }
     }
 
@@ -180,7 +198,14 @@ class PasswordHasher implements IPasswordHasher
         $expectedSubkey = substr($hashedPassword, 1 + $SaltSize, $Pbkdf2SubkeyLength);
 
         // Hash the incoming password and verify it
-        $actualSubkey = hash_pbkdf2(KeyDerivationPrf::ALGO_NAME[$Pbkdf2Prf], $password, $salt, $Pbkdf2IterCount, $Pbkdf2SubkeyLength, true);
+        $actualSubkey = hash_pbkdf2(
+            KeyDerivationPrf::ALGO_NAME[$Pbkdf2Prf],
+            $password,
+            $salt,
+            $Pbkdf2IterCount,
+            $Pbkdf2SubkeyLength,
+            true
+        );
 
         return $actualSubkey === $expectedSubkey;
     }
@@ -210,7 +235,14 @@ class PasswordHasher implements IPasswordHasher
         $expectedSubkey = substr($hashedPassword, 13 + strlen($salt), $subkeyLength);
 
         // Hash the incoming password and verify it
-        $actualSubkey = hash_pbkdf2(KeyDerivationPrf::ALGO_NAME[$prf], $password, $salt, $iterCount, $subkeyLength, true);
+        $actualSubkey = hash_pbkdf2(
+            KeyDerivationPrf::ALGO_NAME[$prf],
+            $password,
+            $salt,
+            $iterCount,
+            $subkeyLength,
+            true
+        );
 
         return $actualSubkey === $expectedSubkey;
     }
@@ -231,4 +263,3 @@ class PasswordHasher implements IPasswordHasher
             | ord($buffer{$offset + 3});
     }
 }
-
