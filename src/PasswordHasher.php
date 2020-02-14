@@ -153,7 +153,7 @@ class PasswordHasher implements IPasswordHasher
             return PasswordVerificationResult::FAILED;
         }
 
-        switch (ord($decodedHashedPassword{0})) {
+        switch (ord($decodedHashedPassword[0])) {
             case 0x00:
                 if (self::verifyHashedPasswordV2($decodedHashedPassword, $providedPassword)) {
                     // This is an old password hash format - the caller needs to
