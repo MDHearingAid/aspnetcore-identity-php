@@ -11,21 +11,6 @@ A direct port of the algorithms used to generate and verify ASP.NET password has
 
 https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Extensions.Core/src/PasswordHasher.cs
 
-## Structure
-
-If any of the following are applicable to your project, then the directory structure should follow industry best practices by being named the following.
-
-```
-bin/
-build/
-docs/
-config/
-src/
-tests/
-vendor/
-```
-
-
 ## Install
 
 Via Composer
