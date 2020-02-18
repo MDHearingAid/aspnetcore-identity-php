@@ -24,7 +24,16 @@ class PasswordHasher implements IPasswordHasher
      * (All UInt32s are stored big-endian.)
      */
 
+    /**
+     * Compatibility mode
+     * @var integer
+     */
     private $compatibilityMode;
+
+    /**
+     * Iteration count
+     * @var integer
+     */
     private $iterCount;
 
     /**
@@ -64,7 +73,7 @@ class PasswordHasher implements IPasswordHasher
       */
     public function hashPassword($password)
     {
-        if ($password == null) {
+        if (is_null($password)) {
             throw new InvalidArgumentException('Password cannot be null');
         }
 
@@ -75,6 +84,12 @@ class PasswordHasher implements IPasswordHasher
         }
     }
 
+    /**
+     * Creates a hashed password using version 2 hashing algorithm.
+     *
+     * @param  string $password
+     * @return string
+     */
     private static function hashPasswordV2($password)
     {
         $pbkdf2Prf = KeyDerivationPrf::HMACSHA1; // default for Rfc2898DeriveBytes
@@ -98,6 +113,12 @@ class PasswordHasher implements IPasswordHasher
         return $outputBytes;
     }
 
+    /**
+     * Creates a hashed password using version 3 hashing algorithm.
+     *
+     * @param  string $password
+     * @return string
+     */
     private function hashPasswordV3($password)
     {
         $prf = KeyDerivationPrf::HMACSHA256;
@@ -140,17 +161,17 @@ class PasswordHasher implements IPasswordHasher
       */
     public function verifyHashedPassword($hashedPassword, $providedPassword)
     {
-        if ($hashedPassword == null) {
+        if (is_null($hashedPassword)) {
             throw new InvalidArgumentException('hashedPassword is null');
         }
 
-        if ($providedPassword == null) {
+        if (is_null($providedPassword)) {
             throw new InvalidArgumentException('providedPassword is null');
         }
 
         $decodedHashedPassword = base64_decode($hashedPassword);
 
-        // read the format marker from the hashed password
+        // Read the format marker from the hashed password
         if (strlen($decodedHashedPassword) == 0) {
             return PasswordVerificationResult::FAILED;
         }
@@ -166,7 +187,7 @@ class PasswordHasher implements IPasswordHasher
     }
 
     /**
-     * Performs verification using strategy version 2.
+     * Performs verification using version 2 password hashing scheme.
      *
      * @param  string $decodedHashedPassword
      * @param  string $providedPassword
@@ -186,7 +207,7 @@ class PasswordHasher implements IPasswordHasher
     }
 
     /**
-     * Performs verification using strategy version 3.
+     * Performs verification using version 3 password hashing scheme.
      *
      * @param  string $decodedHashedPassword
      * @param  string $providedPassword
@@ -206,6 +227,14 @@ class PasswordHasher implements IPasswordHasher
         }
     }
 
+    /**
+     * Attempts to verify the given password against the given hashed password
+     * using version 2 password hashing scheme.
+     *
+     * @param  string $hashedPassword
+     * @param  string $password
+     * @return boolean
+     */
     private static function verifyHashedPasswordV2($hashedPassword, $password)
     {
         $pbkdf2Prf = KeyDerivationPrf::HMACSHA1; // default for Rfc2898DeriveBytes
@@ -235,6 +264,15 @@ class PasswordHasher implements IPasswordHasher
         return $actualSubkey === $expectedSubkey;
     }
 
+    /**
+     * Attempts to verify the given password against the given hashed password
+     * using version 3 password hashing scheme.
+     *
+     * @param  string  $hashedPassword
+     * @param  string  $password
+     * @param  integer &$iterCount
+     * @return boolean
+     */
     private static function verifyHashedPasswordV3($hashedPassword, $password, &$iterCount)
     {
         $iterCount = 0;
@@ -272,6 +310,14 @@ class PasswordHasher implements IPasswordHasher
         return $actualSubkey === $expectedSubkey;
     }
 
+    /**
+     * Updates the given buffer to include network byte order.
+     *
+     * @param  string  &$buffer
+     * @param  integer $offset
+     * @param  integer $value
+     * @return void
+     */
     private static function writeNetworkByteOrder(&$buffer, $offset, $value)
     {
         $buffer[$offset] = chr($value >> 24);
@@ -280,6 +326,13 @@ class PasswordHasher implements IPasswordHasher
         $buffer[$offset + 3] = chr($value & 0xFF);
     }
 
+    /**
+     * Reads and returns the network byte order stored in the given buffer.
+     *
+     * @param  string  $buffer
+     * @param  integer $offset
+     * @return integer
+     */
     private static function readNetworkByteOrder($buffer, $offset)
     {
         return ord($buffer[$offset]) << 24

@@ -50,6 +50,17 @@ class PasswordHasherTest extends \PHPUnit\Framework\TestCase
     /**
      * Test invalid password verification.
      */
+    public function testEmptyPasswordHashVerification()
+    {
+        $hasher = new PasswordHasher();
+        $hashedPassword = base64_encode('');
+        $result = $hasher->verifyHashedPassword($hashedPassword, 'very strong password');
+        $this->assertEquals(PasswordVerificationResult::FAILED, $result);
+    }
+
+    /**
+     * Test invalid password verification.
+     */
     public function testUnexpectedPasswordHashVerification()
     {
         $hasher = new PasswordHasher();
@@ -70,6 +81,40 @@ class PasswordHasherTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * Test some basic v2 password hashing.
+     */
+    public function testHashV2PasswordMismatch()
+    {
+        $hasher = new PasswordHasher(PasswordHasherCompatibilityMode::IDENTITY_V2);
+        $hashedPassword = $hasher->hashPassword('very strong password');
+        $result = $hasher->verifyHashedPassword($hashedPassword, 'very strong password!');
+        $this->assertEquals(PasswordVerificationResult::FAILED, $result);
+    }
+
+    /**
+     * Test some basic v2 password hashing.
+     */
+    public function testHashV2PasswordLength()
+    {
+        $hasher = new PasswordHasher(PasswordHasherCompatibilityMode::IDENTITY_V2);
+        $hashedPassword = $hasher->hashPassword('very strong password');
+        $result = $hasher->verifyHashedPassword(substr($hashedPassword, 0, 20), 'very strong password!!');
+        $this->assertEquals(PasswordVerificationResult::FAILED, $result);
+    }
+
+    /**
+     * Test upgrading v2 password to v3.
+     */
+    public function testHashV2PasswordRehash()
+    {
+        $v2Hasher = new PasswordHasher(PasswordHasherCompatibilityMode::IDENTITY_V2);
+        $v3Hasher = new PasswordHasher(PasswordHasherCompatibilityMode::IDENTITY_V3);
+        $v2HashedPassword = $v2Hasher->hashPassword('very strong password');
+        $result = $v3Hasher->verifyHashedPassword($v2HashedPassword, 'very strong password');
+        $this->assertEquals(PasswordVerificationResult::SUCCESS_REHASH_NEEDED, $result);
+    }
+
+    /**
      * Test insufficient v3 iteration count.
      */
     public function testInsufficientV3IterationCount()
@@ -87,6 +132,18 @@ class PasswordHasherTest extends \PHPUnit\Framework\TestCase
         $hashedPassword = $hasher->hashPassword('very strong password');
         $result = $hasher->verifyHashedPassword($hashedPassword, 'very strong password');
         $this->assertEquals(PasswordVerificationResult::SUCCESS, $result);
+    }
+
+    /**
+     * Test upgrading v3 password to more secure v3.
+     */
+    public function testHashV3PasswordRehash()
+    {
+        $lowIterHasher = new PasswordHasher(PasswordHasherCompatibilityMode::IDENTITY_V3, 1000);
+        $highIterHasher = new PasswordHasher(PasswordHasherCompatibilityMode::IDENTITY_V3);
+        $lowIterHashedPassword = $lowIterHasher->hashPassword('very strong password');
+        $result = $highIterHasher->verifyHashedPassword($lowIterHashedPassword, 'very strong password');
+        $this->assertEquals(PasswordVerificationResult::SUCCESS_REHASH_NEEDED, $result);
     }
 
     /**
