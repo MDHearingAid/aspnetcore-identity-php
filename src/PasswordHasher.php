@@ -77,19 +77,19 @@ class PasswordHasher implements IPasswordHasher
 
     private static function hashPasswordV2($password)
     {
-        $Pbkdf2Prf = KeyDerivationPrf::HMACSHA1; // default for Rfc2898DeriveBytes
-        $Pbkdf2IterCount = 1000; // default for Rfc2898DeriveBytes
-        $Pbkdf2SubkeyLength = intdiv(256, 8); // 256 bits
-        $SaltSize = intdiv(128, 8); // 128 bits
+        $pbkdf2Prf = KeyDerivationPrf::HMACSHA1; // default for Rfc2898DeriveBytes
+        $pbkdf2IterCount = 1000; // default for Rfc2898DeriveBytes
+        $pbkdf2SubkeyLength = intdiv(256, 8); // 256 bits
+        $saltSize = intdiv(128, 8); // 128 bits
 
         // Produce a version 2 (see comment above) text hash.
-        $salt = random_bytes($SaltSize);
+        $salt = random_bytes($saltSize);
         $subkey = hash_pbkdf2(
-            KeyDerivationPrf::ALGO_NAME[$Pbkdf2Prf],
+            KeyDerivationPrf::ALGO_NAME[$pbkdf2Prf],
             $password,
             $salt,
-            $Pbkdf2IterCount,
-            $Pbkdf2SubkeyLength,
+            $pbkdf2IterCount,
+            $pbkdf2SubkeyLength,
             true
         );
 
@@ -208,27 +208,27 @@ class PasswordHasher implements IPasswordHasher
 
     private static function verifyHashedPasswordV2($hashedPassword, $password)
     {
-        $Pbkdf2Prf = KeyDerivationPrf::HMACSHA1; // default for Rfc2898DeriveBytes
-        $Pbkdf2IterCount = 1000; // default for Rfc2898DeriveBytes
-        $Pbkdf2SubkeyLength = intdiv(256, 8); // 256 bits
-        $SaltSize = intdiv(128, 8); // 128 bits
+        $pbkdf2Prf = KeyDerivationPrf::HMACSHA1; // default for Rfc2898DeriveBytes
+        $pbkdf2IterCount = 1000; // default for Rfc2898DeriveBytes
+        $pbkdf2SubkeyLength = intdiv(256, 8); // 256 bits
+        $saltSize = intdiv(128, 8); // 128 bits
 
         // We know ahead of time the exact length of a valid hashed password payload.
-        if (strlen($hashedPassword) != 1 + $SaltSize + $Pbkdf2SubkeyLength) {
+        if (strlen($hashedPassword) != 1 + $saltSize + $pbkdf2SubkeyLength) {
             return false; // bad size
         }
 
-        $salt = substr($hashedPassword, 1, $SaltSize);
+        $salt = substr($hashedPassword, 1, $saltSize);
 
-        $expectedSubkey = substr($hashedPassword, 1 + $SaltSize, $Pbkdf2SubkeyLength);
+        $expectedSubkey = substr($hashedPassword, 1 + $saltSize, $pbkdf2SubkeyLength);
 
         // Hash the incoming password and verify it
         $actualSubkey = hash_pbkdf2(
-            KeyDerivationPrf::ALGO_NAME[$Pbkdf2Prf],
+            KeyDerivationPrf::ALGO_NAME[$pbkdf2Prf],
             $password,
             $salt,
-            $Pbkdf2IterCount,
-            $Pbkdf2SubkeyLength,
+            $pbkdf2IterCount,
+            $pbkdf2SubkeyLength,
             true
         );
 

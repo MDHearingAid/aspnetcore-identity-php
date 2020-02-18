@@ -24,7 +24,7 @@ class PasswordHasherTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $hasher = new PasswordHasher();
-        $hashedPassword = $hasher->hashPassword(null);
+        $result = $hasher->hashPassword(null);
     }
 
     /**
@@ -34,7 +34,7 @@ class PasswordHasherTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $hasher = new PasswordHasher();
-        $hashedPassword = $hasher->verifyHashedPassword(null, 'very strong password');
+        $result = $hasher->verifyHashedPassword(null, 'very strong password');
     }
 
     /**
@@ -44,7 +44,18 @@ class PasswordHasherTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $hasher = new PasswordHasher();
-        $hashedPassword = $hasher->verifyHashedPassword('very strong hash', null);
+        $result = $hasher->verifyHashedPassword('very strong hash', null);
+    }
+
+    /**
+     * Test invalid password verification.
+     */
+    public function testUnexpectedPasswordHashVerification()
+    {
+        $hasher = new PasswordHasher();
+        $hashedPassword = base64_encode(' ');
+        $result = $hasher->verifyHashedPassword($hashedPassword, 'very strong password');
+        $this->assertEquals(PasswordVerificationResult::FAILED, $result);
     }
 
     /**
