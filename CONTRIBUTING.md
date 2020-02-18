@@ -26,6 +26,7 @@ We accept contributions via Pull Requests on [Github](https://github.com/MDHeari
 
 ``` bash
 $ composer test
+$ composer check-style
 ```
 
 

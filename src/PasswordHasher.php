@@ -37,7 +37,7 @@ class PasswordHasher implements IPasswordHasher
     private $iterCount;
 
     /**
-      * Creates a new instance of <see cref="PasswordHasher{TUser}"/>.
+      * Creates a new instance of password hasher.
       *
       * @param $optionsAccessor The options for this instance.
       */

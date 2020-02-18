@@ -35,6 +35,7 @@ Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed re
 
 ``` bash
 $ composer test
+$ composer check-style
 ```
 
 ## Contributing
