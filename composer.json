@@ -1,12 +1,12 @@
 {
-    "name": "mdhearing/aspnetcore-identity",
+    "name": "redrum0x/aspnetcore-identity",
     "type": "library",
     "description": "A direct port of the algorithms used to generate and verify ASP.NET password hashes in .NET Core",
     "keywords": [
         "MDHearingAid",
         "aspnetcore-identity"
     ],
-    "homepage": "https://github.com/MDHearingAid/aspnetcore-identity",
+    "homepage": "https://github.com/redrum0x/aspnetcore-identity",
     "license": "MIT",
     "authors": [
         {
@@ -17,7 +17,7 @@
         }
     ],
     "require": {
-        "php" : "~7.2"
+        "php" : "7.2|^8.0"
     },
     "require-dev": {
         "phpunit/phpunit" : ">=8.0",
