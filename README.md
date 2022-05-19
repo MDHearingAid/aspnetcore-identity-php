@@ -16,7 +16,7 @@ https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Extensions.Core/sr
 Via Composer
 
 ``` bash
-$ composer require mdhearing/aspnetcore-identity
+$ composer require redrum0x/aspnetcore-identity
 ```
 
 ## Usage
