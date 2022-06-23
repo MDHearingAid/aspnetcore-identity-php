@@ -21,6 +21,23 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Security
 - Nothing
 
+## 0.3.0 - 2022-06-23
+
+### Added
+- Support for PHP 8.x
+
+### Deprecated
+- Nothing
+
+### Fixed
+- Nothing
+
+### Removed
+- Nothing
+
+### Security
+- Nothing
+
 ## 0.2.0 - 2020-03-02
 
 ### Added
